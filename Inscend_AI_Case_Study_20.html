@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscend AI — Case Study: From Zero AI Strategy to 53 Governed Agents</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#080808;--black2:#0E0E0E;--black3:#161616;--black4:#1C1C1C;
+  --g1:#2A2A2A;--g2:#555;--g3:#888;--g4:#AAA;--g5:#D0D0D0;--g6:#E8E8E8;
+  --white:#fff;--surface:#F6F6F6;
+  --t1:#141414;--t2:#333;--t3:#666;--t4:#999;
+  --blue:#3B82F6;--blue-d:#2563EB;--blue-l:rgba(59,130,246,.08);--blue-l2:rgba(59,130,246,.15);
+  --r:5px;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--white);color:var(--t1);font-family:'Outfit',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;font-size:15px}
+::selection{background:rgba(59,130,246,.15)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g5);border-radius:2px}
+.c{max-width:1100px;margin:0 auto;padding:0 48px;position:relative;z-index:1}
+@media(max-width:768px){.c{padding:0 24px}}
+
+/* SCROLL REVEAL */
+[data-r]{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+[data-r].v{opacity:1;transform:translateY(0)}
+[data-r="1"]{transition-delay:.06s}[data-r="2"]{transition-delay:.12s}[data-r="3"]{transition-delay:.18s}
+[data-r="4"]{transition-delay:.24s}[data-r="5"]{transition-delay:.3s}[data-r="6"]{transition-delay:.36s}
+
+/* PROGRESS */
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--blue);z-index:200;transition:width .1s linear;width:0}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:all .35s cubic-bezier(.22,1,.36,1)}
+#nav.scrolled{background:rgba(8,8,8,.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;padding:20px 0}
+#nav.scrolled .nav-inner{padding:14px 0}
+.nav-logo{text-decoration:none}
+.logo{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fff}
+.logo span{font-weight:300;opacity:.4}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;transition:.25s;padding:4px 0;border-bottom:1.5px solid transparent}
+.nav-links a:hover{color:rgba(255,255,255,.7)}
+.nav-links a.active{color:#fff;border-bottom-color:var(--blue)}
+.nav-cta{border:1px solid rgba(255,255,255,.18);color:#fff !important;padding:8px 22px;border-radius:3px;transition:.25s !important;border-bottom:1px solid rgba(255,255,255,.18) !important}
+.nav-cta:hover{background:#fff;color:var(--black) !important;border-color:#fff !important}
+@media(max-width:900px){.nav-links{display:none}}
+
+/* HERO */
+#hero{background:var(--black);min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-grain{position:absolute;inset:0;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+.hero-glow{position:absolute;top:-30%;right:-20%;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.03) 0%,transparent 70%);pointer-events:none}
+.hero-content{position:relative;z-index:2;padding:160px 0 100px;max-width:720px}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:36px;padding:10px 22px 10px 18px;border:1px solid rgba(59,130,246,.3);border-radius:24px;background:rgba(59,130,246,.06);backdrop-filter:blur(8px);box-shadow:0 0 20px rgba(59,130,246,.08)}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px rgba(59,130,246,.6)}
+.hero-line{overflow:hidden}
+.hero-title{font-size:clamp(40px,6vw,68px);font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1.02}
+.hero-line .hero-title{transform:translateY(110%);animation:slideUp .8s cubic-bezier(.22,1,.36,1) forwards}
+.hero-line:nth-child(2) .hero-title{animation-delay:.08s}
+.hero-line:nth-child(3) .hero-title{animation-delay:.16s}
+@keyframes slideUp{to{transform:translateY(0)}}
+.hero-title .light{font-weight:200;color:var(--g3)}
+.hero-desc{font-size:16px;color:var(--g3);line-height:1.8;max-width:520px;margin-top:28px;opacity:0;animation:fadeIn .8s .5s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes fadeIn{to{opacity:1}}
+.hero-metrics{display:flex;gap:40px;margin-top:52px;padding-top:40px;border-top:1px solid rgba(255,255,255,.06);opacity:0;animation:fadeIn .8s .7s cubic-bezier(.22,1,.36,1) forwards}
+@media(max-width:600px){.hero-metrics{flex-wrap:wrap;gap:24px 40px}}
+.hm-val{font-size:44px;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.hm-val .u{font-size:22px;font-weight:300;opacity:.4}
+.hm-lab{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--g3);margin-top:6px;font-weight:500}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fadeIn 1s 1.2s forwards}
+.scroll-line{width:1px;height:32px;position:relative;overflow:hidden}
+.scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:var(--blue);animation:scrollPulse 2s ease-in-out infinite}
+@keyframes scrollPulse{0%{top:-100%;opacity:0}50%{top:0;opacity:.4}100%{top:100%;opacity:0}}
+.scroll-text{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--g3)}
+
+/* SNAP RIBBON */
+#snap{background:var(--blue-d);border-bottom:none}
+.snap-inner{display:flex;justify-content:center;padding:13px 0;flex-wrap:wrap;gap:4px 32px}
+.snap-i{font-size:11px;color:rgba(255,255,255,.7);letter-spacing:.02em}
+.snap-i b{color:#fff;font-weight:700}
+.snap-div{width:1px;height:14px;background:rgba(255,255,255,.2);align-self:center}
+@media(max-width:600px){.snap-div{display:none}}
+
+/* SECTIONS */
+.sec{padding:100px 0;position:relative}
+.sec.dark{background:var(--black)}.sec.dark2{background:var(--black2)}.sec.light{background:var(--white)}.sec.surface{background:var(--surface)}
+.sec-fade{height:80px}.sec-fade.to-dark{background:linear-gradient(var(--white),var(--black))}.sec-fade.to-light{background:linear-gradient(var(--black),var(--white))}.sec-fade.to-surface{background:linear-gradient(var(--white),var(--surface))}.sec-fade.to-dark2{background:linear-gradient(var(--surface),var(--black2))}
+.label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--g3);margin-bottom:10px}
+.label .blue{color:var(--blue)}
+.title{font-size:clamp(26px,3.2vw,38px);font-weight:800;color:var(--t1);letter-spacing:-.03em;line-height:1.1;margin-bottom:6px}
+.sec.dark .title,.sec.dark2 .title{color:#fff}
+.desc{font-size:14px;color:var(--t3);line-height:1.75;max-width:520px;font-weight:400}
+.sec.dark .desc,.sec.dark2 .desc{color:var(--g3)}
+.rule{width:32px;height:1.5px;background:var(--blue);margin:12px 0 18px;opacity:.5}
+
+/* CHALLENGE */
+.challenge-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;margin-top:48px}
+@media(max-width:768px){.challenge-grid{grid-template-columns:1fr;gap:32px}}
+.challenge-pull{font-size:clamp(22px,2.5vw,30px);font-weight:300;color:var(--t1);letter-spacing:-.02em;line-height:1.35}
+.challenge-pull strong{font-weight:800}
+.ch-point{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px}
+.ch-num{font-size:32px;font-weight:800;letter-spacing:-.03em;color:var(--g6);line-height:1;flex-shrink:0;width:36px}
+.ch-text{font-size:13px;color:var(--t2);line-height:1.6}.ch-text strong{font-weight:700;color:var(--t1)}
+
+/* CONTEXT BLOCK */
+.context{background:var(--surface);border-radius:var(--r);padding:24px 28px;margin:40px 0;border-left:3px solid var(--blue);border-left-opacity:.3}
+.sec.dark .context,.sec.dark2 .context{background:rgba(255,255,255,.03);border-color:rgba(59,130,246,.4)}
+.context-q{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+.context-a{font-size:15px;font-weight:400;color:var(--t2);line-height:1.65}
+.sec.dark .context-a,.sec.dark2 .context-a{color:var(--g4)}
+
+/* TIMELINE */
+.tl-track{display:flex;gap:0;position:relative;margin-top:56px}
+.tl-track::before{content:'';position:absolute;top:20px;left:0;right:0;height:1px;background:rgba(255,255,255,.06)}
+.tl-card{flex:1;padding:0 20px;position:relative}.tl-card:first-child{padding-left:0}.tl-card:last-child{padding-right:0}
+.tl-dot{width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:var(--black);position:relative;z-index:2;margin-bottom:20px}
+.tl-card.done .tl-dot{background:var(--blue);border-color:var(--blue)}
+.tl-card.active .tl-dot{background:transparent;border-color:var(--blue);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+.tl-phase{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:2px}
+.tl-name{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:8px}
+.tl-desc{font-size:12px;color:var(--g3);line-height:1.6;margin-bottom:14px}
+.tl-stats{display:flex;gap:8px;flex-wrap:wrap}
+.tl-stat{font-size:10px;color:var(--g3);background:rgba(255,255,255,.04);padding:3px 8px;border-radius:3px}.tl-stat b{color:#fff;font-weight:700}
+@media(max-width:768px){.tl-track{flex-direction:column;gap:28px}.tl-track::before{display:none}}
+
+/* PHASE HEAD */
+.ph-head{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start;margin-bottom:56px}
+@media(max-width:768px){.ph-head{grid-template-columns:1fr;gap:28px}}
+.ph-num{font-size:88px;font-weight:900;letter-spacing:-.06em;line-height:.85;-webkit-text-stroke:1.5px var(--g6);-webkit-text-fill-color:transparent;margin-bottom:8px}
+.sec.dark .ph-num,.sec.dark2 .ph-num{-webkit-text-stroke-color:rgba(255,255,255,.06)}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{border:1px solid var(--g6);border-radius:var(--r);padding:18px 16px;transition:.2s}
+.kpi:hover{border-color:var(--g5);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.sec.dark .kpi,.sec.dark2 .kpi{border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+.sec.dark .kpi:hover,.sec.dark2 .kpi:hover{border-color:rgba(255,255,255,.1)}
+.kpi-n{font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--t1)}
+.sec.dark .kpi-n,.sec.dark2 .kpi-n{color:#fff}
+.kpi-l{font-size:10px;color:var(--t4);margin-top:3px;font-weight:400;line-height:1.35}
+.sec.dark .kpi-l,.sec.dark2 .kpi-l{color:var(--g3)}
+
+/* SUB SECTION */
+.sub{margin-top:56px}
+.sub-l{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t4);margin-bottom:3px}
+.sec.dark .sub-l,.sec.dark2 .sub-l{color:var(--g3)}
+.sub-t{font-size:20px;font-weight:800;color:var(--t1);letter-spacing:-.02em;margin-bottom:2px}
+.sec.dark .sub-t,.sec.dark2 .sub-t{color:#fff}
+.sub-d{font-size:12px;color:var(--t3);font-weight:400}.sec.dark .sub-d,.sec.dark2 .sub-d{color:var(--g3)}
+
+/* BARS */
+.bars{margin-top:20px}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:5px}
+.bar-label{width:110px;font-size:12px;font-weight:500;color:var(--t2);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:26px;background:var(--surface);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding:0 12px;font-size:10px;font-weight:700;color:#fff;letter-spacing:.01em;width:0;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.bar-range{font-family:'JetBrains Mono';font-size:10px;font-weight:500;color:var(--t4);margin-left:12px;white-space:nowrap;flex-shrink:0;width:92px;opacity:0;transition:opacity .6s .8s}.bar-range.v{opacity:1}
+
+/* DELIVERABLES */
+.del-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+@media(max-width:600px){.del-grid{grid-template-columns:1fr}}
+.del{border:1px solid var(--g6);border-radius:var(--r);padding:18px 20px;transition:.25s;cursor:default}
+.del:hover{border-color:var(--t1);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.sec.dark .del,.sec.dark2 .del{border-color:rgba(255,255,255,.06)}
+.sec.dark .del:hover,.sec.dark2 .del:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px);box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.del-n{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.sec.dark .del-n,.sec.dark2 .del-n{color:#fff}
+.del-d{font-size:11.5px;color:var(--t3);line-height:1.55}
+.sec.dark .del-d,.sec.dark2 .del-d{color:var(--g3)}
+
+/* McKINSEY-STYLE USE CASE ARCHITECTURE */
+.arch{margin-top:24px;border:1px solid var(--g6);border-radius:6px;overflow:hidden}
+.arch-layer{border-bottom:1px solid var(--g6);display:grid;grid-template-columns:140px 1fr;min-height:52px}
+.arch-layer:last-child{border:none}
+.arch-fn{padding:14px 16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:8px;line-height:1.2}
+.arch-fn .fn-count{font-weight:400;opacity:.5;font-size:9px}
+.arch-fn.fn-comp{background:#1e40af}.arch-fn.fn-corp{background:#1d4ed8}.arch-fn.fn-inv{background:#2563eb}.arch-fn.fn-mkt{background:#3b82f6}.arch-fn.fn-ops{background:#60a5fa}
+.arch-cases{padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.arch-case{background:var(--white);border:1px solid var(--g6);border-radius:4px;padding:7px 12px;font-size:11px;font-weight:500;color:var(--t2);transition:.2s;position:relative;cursor:default}
+.arch-case:hover{border-color:var(--blue);background:var(--blue-l);color:var(--t1);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.arch-case .ac-id{font-family:'JetBrains Mono';font-size:8px;font-weight:600;color:var(--t4);display:block;line-height:1;margin-bottom:2px}
+@media(max-width:600px){.arch-layer{grid-template-columns:1fr}.arch-fn{padding:10px 16px}}
+
+/* SPEC CARDS */
+.spec-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+@media(max-width:768px){.spec-row{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.spec-row{grid-template-columns:1fr}}
+.spec{border:1px solid var(--g6);border-radius:var(--r);padding:20px 18px;transition:.25s;position:relative;overflow:hidden}
+.spec:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.spec-icon{margin-bottom:10px}.spec-icon svg{width:24px;height:24px}
+.spec-n{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px;line-height:1.25}
+.spec-d{font-size:10.5px;color:var(--t3);line-height:1.5}
+.spec-count{position:absolute;top:12px;right:14px;font-family:'JetBrains Mono';font-size:20px;font-weight:800;color:var(--blue-l2);line-height:1}
+
+/* KNOWLEDGE GRAPH VISUAL */
+.kg-wrap{position:relative;width:100%;height:400px;overflow:hidden;border-radius:12px;background:radial-gradient(ellipse at 50% 50%,rgba(8,20,40,.95) 0%,rgba(4,10,20,.98) 100%);border:1px solid rgba(59,130,246,.1)}
+.kg-wrap canvas{display:block;width:100%;height:100%}
+
+/* AGENT CONSTELLATION */
+.ag-wrap{margin-top:28px}
+.ag-fn{margin-bottom:20px}
+.ag-fn-head{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--g3);margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.ag-fn-head::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.04)}
+.ag-fn-count{font-weight:400;opacity:.5}
+.ag-dots{display:flex;flex-wrap:wrap;gap:4px}
+.ag-dot{width:40px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:7.5px;font-weight:500;cursor:default;position:relative;border:1px solid transparent;transition:all .25s cubic-bezier(.22,1,.36,1);transform:scale(0);opacity:0}
+.ag-dot.spawned{transform:scale(1);opacity:1}
+.ag-dot:hover{z-index:3;transform:scale(1.12);filter:brightness(1.4)}
+/* Function-specific shades */
+.ag-dot.fn-ops{background:rgba(96,165,250,.12);color:rgba(96,165,250,.7);border-color:rgba(96,165,250,.15)}
+.ag-dot.fn-comp{background:rgba(129,140,248,.12);color:rgba(129,140,248,.7);border-color:rgba(129,140,248,.15)}
+.ag-dot.fn-corp{background:rgba(59,130,246,.12);color:rgba(59,130,246,.7);border-color:rgba(59,130,246,.15)}
+.ag-dot.fn-inv{background:rgba(34,211,238,.1);color:rgba(34,211,238,.6);border-color:rgba(34,211,238,.12)}
+.ag-dot.fn-mkt{background:rgba(167,139,250,.1);color:rgba(167,139,250,.6);border-color:rgba(167,139,250,.12)}
+/* Orchestrator emphasis */
+.ag-dot[data-rl="Orchestrator"]{filter:brightness(1.2);border-width:1.5px}
+.ag-dot[data-rl="Validator"]{border-style:dashed}
+.ag-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) scale(.95);background:rgba(8,8,8,.95);border:1px solid rgba(255,255,255,.1);color:#fff;padding:9px 14px;border-radius:6px;font-family:'Outfit';font-size:11px;white-space:nowrap;pointer-events:none;opacity:0;transition:all .2s cubic-bezier(.22,1,.36,1);z-index:20;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.ag-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:rgba(8,8,8,.95)}
+.ag-dot:hover .ag-tip{opacity:1;transform:translateX(-50%) scale(1)}
+.ag-tip strong{font-weight:700}.ag-tip .m{color:var(--g3);font-size:9px;display:block;margin-top:2px}
+.ag-legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
+.ag-legend-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g3)}
+.ag-legend-swatch{width:24px;height:16px;border-radius:3px}
+.ag-legend-swatch.orch{background:rgba(59,130,246,.15);border:1.5px solid rgba(59,130,246,.3)}
+.ag-legend-swatch.work{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.12)}
+.ag-legend-swatch.valid{background:rgba(59,130,246,.08);border:1px dashed rgba(59,130,246,.2)}
+
+/* GOV MODULES */
+.gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+@media(max-width:600px){.gov-grid{grid-template-columns:1fr}}
+.gov{border:1px solid rgba(255,255,255,.05);border-radius:var(--r);padding:18px 20px;transition:.25s;position:relative;overflow:hidden}
+.gov:hover{border-color:rgba(255,255,255,.1);transform:translateY(-1px)}
+.gov-bar{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:.3s}.gov:hover .gov-bar{opacity:1}
+.gov.live .gov-bar{background:var(--blue)}.gov.next .gov-bar{background:var(--g3)}.gov.plan .gov-bar{background:var(--g2)}
+.gov-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.gov-n{font-size:13px;font-weight:700;color:#fff}
+.gov-tag{font-size:7px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px}
+.gov-tag.live{background:rgba(59,130,246,.15);color:var(--blue)}.gov-tag.next{background:rgba(255,255,255,.05);color:var(--g4)}.gov-tag.plan{background:rgba(255,255,255,.03);color:var(--g3)}
+.gov-d{font-size:11.5px;color:var(--g3);line-height:1.5}
+
+/* RESULTS */
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+@media(max-width:768px){.val-grid{grid-template-columns:1fr;gap:40px}}
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.vs{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.04);border-radius:var(--r);padding:22px 16px;text-align:center;transition:.25s}
+.vs:hover{border-color:rgba(59,130,246,.2);background:rgba(59,130,246,.03)}
+.vs-n{font-size:32px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1}
+.vs-l{font-size:9.5px;color:var(--g3);margin-top:5px;font-weight:400;line-height:1.35}
+
+/* SERVICES */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--g6);border:1px solid var(--g6);border-radius:6px;overflow:hidden;margin-top:40px}
+@media(max-width:768px){.why-grid{grid-template-columns:1fr}}
+.why{background:var(--white);padding:28px 24px;transition:.15s}.why:hover{background:var(--surface)}
+.why-n{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:6px}.why-d{font-size:12px;color:var(--t3);line-height:1.6}
+
+/* CTA */
+#cta{padding:88px 0;text-align:center;position:relative}
+#cta::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:48px;background:linear-gradient(var(--g6),transparent)}
+.cta-t{font-size:clamp(26px,3vw,36px);font-weight:800;color:var(--t1);letter-spacing:-.025em;margin-bottom:10px;margin-top:24px}
+.cta-d{font-size:14px;color:var(--t3);max-width:420px;margin:0 auto 28px;font-weight:400;line-height:1.7}
+.cta-btn{display:inline-block;background:var(--blue-d);color:#fff;padding:14px 40px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:.25s cubic-bezier(.22,1,.36,1)}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.3);background:var(--blue)}
+
+/* FOOTER */
+#footer{background:var(--black);padding:24px 0;text-align:center}
+.f-logo{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#fff;margin-bottom:3px}.f-logo span{font-weight:300;opacity:.35}
+.f-meta{font-size:10px;color:var(--g3)}.f-meta a{color:var(--g4);text-decoration:none;transition:.2s}.f-meta a:hover{color:#fff}
+
+/* ═══ SILK ART — Dark section ambient lighting ═══ */
+#hero::after,#approach::after,#phase3::after,#results::after,#cta::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
+#hero::after{background:
+  radial-gradient(ellipse 60% 50% at 85% 70%, rgba(10,42,78,.4) 0%, transparent 70%),
+  radial-gradient(ellipse 40% 60% at 75% 30%, rgba(13,53,88,.25) 0%, transparent 60%),
+  radial-gradient(ellipse 50% 40% at 20% 80%, rgba(8,30,58,.2) 0%, transparent 65%)}
+#approach::after{background:
+  radial-gradient(ellipse 45% 55% at 80% 75%, rgba(10,42,78,.35) 0%, transparent 65%),
+  radial-gradient(ellipse 35% 45% at 15% 25%, rgba(13,53,88,.2) 0%, transparent 60%)}
+#phase3::after{background:
+  radial-gradient(ellipse 50% 45% at 10% 40%, rgba(10,42,78,.3) 0%, transparent 65%),
+  radial-gradient(ellipse 55% 50% at 90% 60%, rgba(13,53,88,.25) 0%, transparent 65%),
+  radial-gradient(ellipse 40% 35% at 50% 15%, rgba(8,30,58,.15) 0%, transparent 60%),
+  radial-gradient(ellipse 45% 40% at 65% 85%, rgba(10,42,78,.2) 0%, transparent 60%)}
+#results::after{background:
+  radial-gradient(ellipse 50% 60% at 20% 50%, rgba(10,42,78,.3) 0%, transparent 65%),
+  radial-gradient(ellipse 40% 45% at 85% 30%, rgba(13,53,88,.2) 0%, transparent 60%)}
+#cta::after{background:
+  radial-gradient(ellipse 60% 50% at 50% 50%, rgba(10,42,78,.25) 0%, transparent 70%)}
+
+
+/* ═══ HERO FIGURE GLOW ═══ */
+.hm-val{position:relative}
+.hm-val .counter,.hm-val{color:#fff;text-shadow:0 0 30px rgba(59,130,246,.25)}
+@keyframes figPulse{0%,100%{text-shadow:0 0 20px rgba(59,130,246,.2)}50%{text-shadow:0 0 40px rgba(59,130,246,.4),0 0 80px rgba(59,130,246,.1)}}
+.hero-metrics .hm-val{animation:figPulse 4s ease-in-out infinite}
+
+/* ═══ CHALLENGE VISUAL FLOW ═══ */
+.ch-num{color:var(--blue)!important;font-size:28px!important;font-weight:700!important}
+
+/* ═══ GOVERNANCE LIVE PULSE ═══ */
+.gov.live{border:1px solid rgba(59,130,246,.25);background:rgba(59,130,246,.04)}
+.gov.live .gov-bar{background:var(--blue)!important;box-shadow:0 0 8px rgba(59,130,246,.4)}
+.gov-tag.live{background:var(--blue)!important;color:#fff!important;box-shadow:0 0 10px rgba(59,130,246,.3)}
+@keyframes livePulse{0%,100%{box-shadow:0 0 8px rgba(59,130,246,.3)}50%{box-shadow:0 0 16px rgba(59,130,246,.6)}}
+.gov.live .gov-bar{animation:livePulse 3s ease-in-out infinite}
+
+/* ═══ AGENT ROLE BORDERS ═══ */
+.ag-box[data-role="Orchestrator"]{border:2px solid rgba(59,130,246,.5)!important;box-shadow:0 0 12px rgba(59,130,246,.15)}
+.ag-box[data-role="Validator"]{border:2px dashed rgba(168,85,247,.45)!important}
+.ag-box[data-role="Worker"]{border:1px solid rgba(255,255,255,.12)!important}
+
+/* ═══ RESULTS BOX ANIMATIONS ═══ */
+@keyframes vsSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.vs{opacity:0;animation:vsSlideUp .6s ease forwards;animation-play-state:paused}
+.vs.in-view{animation-play-state:running}
+.vs:nth-child(2){animation-delay:.1s}.vs:nth-child(3){animation-delay:.2s}
+.vs:nth-child(4){animation-delay:.3s}.vs:nth-child(5){animation-delay:.4s}.vs:nth-child(6){animation-delay:.5s}
+.vs:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.3);border-color:rgba(59,130,246,.3)}
+.vs{transition:transform .3s,box-shadow .3s,border-color .3s}
+.vs-n{color:#fff;text-shadow:0 0 20px rgba(59,130,246,.2)}
+
+/* ═══ KPI BOXES POP ═══ */
+.kpi{transition:transform .3s,box-shadow .3s;border:1px solid rgba(59,130,246,.08)}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-color:rgba(59,130,246,.2)}
+.kpi-n{color:var(--blue)!important}
+
+/* ═══ TL-STAT BOXES IN APPROACH ═══ */
+.tl-stat{background:rgba(59,130,246,.06);padding:4px 10px;border-radius:4px;border:1px solid rgba(59,130,246,.12)}
+.tl-stat b{color:var(--blue)}
+
+/* ═══ ARCH CASE POPUP ═══ */
+.arch-case{cursor:pointer;position:relative;transition:all .25s}
+.arch-case:hover{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.25)}
+.ac-popup{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#111;color:#ddd;border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:14px 18px;width:280px;font-size:12px;line-height:1.6;z-index:50;box-shadow:0 12px 40px rgba(0,0,0,.5);pointer-events:none;opacity:0;transition:opacity .2s}
+.arch-case.show-popup .ac-popup{opacity:1;pointer-events:auto}
+.ac-popup::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#111}
+.ac-popup strong{color:var(--blue);font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px}
+.ac-popup p{margin:0 0 4px;font-size:12px;color:#bbb}
+.ac-popup .ac-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.ac-popup .ac-tag{font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.15);color:rgba(59,130,246,.8)}
+
+/* ═══ BUSINESS OUTCOMES FRAMEWORK ═══ */
+.bo-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:24px;border-radius:12px;overflow:hidden}
+.bo-card{padding:28px 24px;position:relative}
+.bo-card.rev{background:rgba(239,68,68,.06);border-left:3px solid rgba(239,68,68,.4)}
+.bo-card.cost{background:rgba(59,130,246,.06);border-left:3px solid rgba(59,130,246,.4)}
+.bo-card.qual{background:rgba(168,85,247,.06);border-left:3px solid rgba(168,85,247,.4)}
+.bo-card.flex{background:rgba(34,197,94,.06);border-left:3px solid rgba(34,197,94,.4)}
+.bo-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.bo-card.rev .bo-icon{background:rgba(239,68,68,.1)}.bo-card.cost .bo-icon{background:rgba(59,130,246,.1)}
+.bo-card.qual .bo-icon{background:rgba(168,85,247,.1)}.bo-card.flex .bo-icon{background:rgba(34,197,94,.1)}
+.bo-icon svg{width:18px;height:18px}
+.bo-title{font-weight:700;font-size:15px;margin-bottom:8px;color:var(--t1)}
+.bo-items{font-size:13px;color:var(--t3);line-height:1.7}
+@media(max-width:600px){.bo-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<nav id="nav"><div class="c nav-inner"><a href="https://inscendai.com" class="nav-logo" target="_blank"><div class="logo">INSCEND <span>AI</span></div></a><div class="nav-links"><a href="#challenge" data-sec="challenge">Challenge</a><a href="#approach" data-sec="approach">Approach</a><a href="#phase1" data-sec="phase1">Discover</a><a href="#phase2" data-sec="phase2">Design</a><a href="#phase3" data-sec="phase3">Govern</a><a href="#results" data-sec="results">Results</a><a href="https://inscendai.com/contact-us" class="nav-cta" target="_blank">Get Started</a></div></div></nav>
+
+<section id="hero"><div class="hero-grain"></div><div class="hero-glow"></div><div class="c"><div class="hero-content">
+<div class="hero-badge"><span class="hero-badge-dot"></span>Case Study &mdash; Wealth Management</div>
+<div class="hero-line"><div class="hero-title">From Zero AI Strategy</div></div>
+<div class="hero-line"><div class="hero-title">to 53 Governed Agents</div></div>
+<div class="hero-line"><div class="hero-title"><span class="light">in Under 6 Months</span></div></div>
+<p class="hero-desc">A leading Canadian wealth manager needed to move from strategic ambiguity to enterprise AI adoption. Inscend delivered a prioritized roadmap, implementation-ready specifications, and a governance platform managing 53 AI agents across five business functions.</p>
+<div class="hero-metrics">
+<div class="hm"><div class="hm-val"><span class="counter" data-target="41">0</span></div><div class="hm-lab">Use Cases Identified</div></div>
+<div class="hm"><div class="hm-val">$738<span class="u">K</span></div><div class="hm-lab">Est. Annual Value</div></div>
+<div class="hm"><div class="hm-val"><span class="counter" data-target="53">0</span></div><div class="hm-lab">AI Agents Governed</div></div>
+<div class="hm"><div class="hm-val">5</div><div class="hm-lab">Business Functions</div></div>
+</div></div></div>
+<div class="hero-scroll"><div class="scroll-line"></div><div class="scroll-text">Scroll</div></div>
+</section>
+
+<section id="snap"><div class="c"><div class="snap-inner">
+<div class="snap-i"><b>Client</b> &nbsp;Canadian Wealth Manager</div><div class="snap-div"></div>
+<div class="snap-i"><b>Industry</b> &nbsp;Financial Services</div><div class="snap-div"></div>
+<div class="snap-i"><b>Employees</b> &nbsp;150+</div><div class="snap-div"></div>
+<div class="snap-i"><b>Duration</b> &nbsp;~6 Months (Ongoing)</div>
+</div></div></section>
+
+<!-- CHALLENGE -->
+<section id="challenge" class="sec light"><div class="c">
+<div class="label" data-r>THE CHALLENGE</div>
+<div class="title" data-r="1">The Gap Between AI Ambition<br>and Operational Reality</div>
+<div class="rule" data-r="1"></div>
+<div class="challenge-grid">
+<div class="challenge-pull" data-r>A multi-billion dollar wealth management firm recognized the strategic importance of AI. <strong>The challenge was not awareness. It was the absence of a structured path from intent to execution.</strong></div>
+<div>
+<div class="ch-point" data-r="1"><div class="ch-num">01</div><div class="ch-text"><strong>No unified AI strategy.</strong> No framework to evaluate feasibility, quantify value, or sequence implementation across the enterprise.</div></div>
+<div class="ch-point" data-r="2"><div class="ch-num">02</div><div class="ch-text"><strong>High cost of getting it wrong.</strong> In regulated wealth management, a poorly scoped AI initiative erodes confidence across compliance, leadership, and client relationships.</div></div>
+<div class="ch-point" data-r="3"><div class="ch-num">03</div><div class="ch-text"><strong>No infrastructure for AI oversight.</strong> No governance layer to monitor performance, manage risk, or maintain audit readiness at scale.</div></div>
+</div></div>
+<div class="context" data-r style="margin-top:48px"><div class="context-q">THE ENGAGEMENT</div><div class="context-a">Inscend was engaged to architect the full journey: identify where AI creates measurable value, produce implementation-ready specifications, and build the governance platform to manage it all.</div></div>
+</div></section>
+
+<!-- APPROACH -->
+<div class="sec-fade to-dark"></div>
+<section id="approach" class="sec dark"><div class="c">
+<div class="label" data-r><span class="blue">THE APPROACH</span></div>
+<div class="title" data-r="1" style="color:#fff">From Assessment to<br>Autonomous Operations.</div>
+<div class="rule" data-r="1"></div>
+<p class="desc" data-r="2">A phased methodology designed to take organizations from strategic ambiguity to governed AI operations. Each phase compounds the value of the last.</p>
+<div class="tl-track" data-r="3">
+<div class="tl-card done"><div class="tl-dot"></div><div class="tl-phase">Phase 1 &middot; 8 Weeks</div><div class="tl-name">Discover</div><div class="tl-desc">Map every AI opportunity across the enterprise. Quantify the value. Build a prioritized 12-month roadmap aligned to strategic objectives.</div><div class="tl-stats"><span class="tl-stat"><b>41</b> use cases</span><span class="tl-stat"><b>$738K</b> value mapped</span><span class="tl-stat"><b>5</b> functions</span></div></div>
+<div class="tl-card done"><div class="tl-dot"></div><div class="tl-phase">Phase 2 &middot; 11 Weeks</div><div class="tl-name">Design</div><div class="tl-desc">Develop implementation-ready blueprints for the highest-priority use cases: detailed requirements, technical architecture, and data readiness assessments.</div><div class="tl-stats"><span class="tl-stat"><b>10</b> use cases specified</span><span class="tl-stat"><b>5</b> functions covered</span></div></div>
+<div class="tl-card active"><div class="tl-dot"></div><div class="tl-phase">Phase 3 &middot; Ongoing</div><div class="tl-name">Govern</div><div class="tl-desc">Deploy the operating system for AI: agent registry, performance tracking, risk management, and compliance oversight in a unified governance platform.</div><div class="tl-stats"><span class="tl-stat"><b>53</b> agents</span><span class="tl-stat"><b>6</b> modules</span><span class="tl-stat"><b>3-tier</b> KPIs</span></div></div>
+</div></div></section>
+
+<!-- PHASE 1 -->
+<div class="sec-fade to-light"></div>
+<section id="phase1" class="sec light"><div class="c">
+<div class="ph-head"><div>
+<div class="ph-num" data-r>01</div>
+<div class="label" data-r="1"><span class="blue">PHASE 1</span> &middot; DISCOVER</div>
+<div class="title" data-r="2">AI Strategy & Roadmap</div>
+<div class="rule" data-r="2"></div>
+<p class="desc" data-r="3">Over 8 weeks, Inscend conducted stakeholder workshops across every business function, identified 41 AI and automation opportunities, quantified the financial impact of each, and delivered a prioritized 12-month implementation roadmap.</p>
+</div><div>
+<div class="kpi-grid" data-r="2">
+<div class="kpi"><div class="kpi-n counter" data-target="41">0</div><div class="kpi-l">Total use cases identified<br>(24 AI + 17 automation)</div></div>
+<div class="kpi"><div class="kpi-n">5</div><div class="kpi-l">Business functions<br>analyzed end-to-end</div></div>
+<div class="kpi"><div class="kpi-n">$738K</div><div class="kpi-l">Estimated annual<br>value mapped</div></div>
+<div class="kpi"><div class="kpi-n">12-Mo</div><div class="kpi-l">Phased implementation<br>roadmap delivered</div></div>
+</div></div></div>
+<div class="context" data-r><div class="context-q">OUR PERSPECTIVE</div><div class="context-a">Most organizations begin AI adoption by selecting a tool and searching for a problem. We invert that: map every problem worth solving first, quantify the value, then match the right technology. The use case inventory becomes the foundation for everything that follows.</div></div>
+
+<div class="sub" data-r><div class="sub-l">ESTIMATED ANNUAL VALUE</div><div class="sub-t">Value by Business Function</div><div class="sub-d">Bottom-up calculation: hours saved per use case, blended hourly rate, conservative realization factor. Ranges reflect low and high estimates.</div></div>
+<div class="bars" data-r id="bars1">
+<div class="bar-row"><div class="bar-label">Operations</div><div class="bar-track"><div class="bar-fill" style="background:var(--t1)" data-w="100%">$185K</div></div><div class="bar-range">$150K &ndash; $220K</div></div>
+<div class="bar-row"><div class="bar-label">Corporate Dev</div><div class="bar-track"><div class="bar-fill" style="background:var(--g1)" data-w="69%">$128K</div></div><div class="bar-range">$102K &ndash; $153K</div></div>
+<div class="bar-row"><div class="bar-label">Compliance</div><div class="bar-track"><div class="bar-fill" style="background:var(--g2)" data-w="56%">$103K</div></div><div class="bar-range">$84K &ndash; $122K</div></div>
+<div class="bar-row"><div class="bar-label">Marketing</div><div class="bar-track"><div class="bar-fill" style="background:var(--g3)" data-w="30%">$55K</div></div><div class="bar-range">$40K &ndash; $70K</div></div>
+<div class="bar-row"><div class="bar-label">Investment</div><div class="bar-track"><div class="bar-fill" style="background:var(--g4)" data-w="14%">TBD</div></div><div class="bar-range">Under Assessment</div></div>
+</div>
+
+<div class="sub" data-r><div class="sub-l">DELIVERABLES</div><div class="sub-t">Phase 1 Outputs</div></div>
+<div class="del-grid">
+<div class="del" data-r="1"><div class="del-n">AI Use Case Inventory</div><div class="del-d">41 opportunities with problem statements, proposed solutions, technology recommendations, and stakeholder mapping across all business functions.</div></div>
+<div class="del" data-r="2"><div class="del-n">Prioritization Matrix</div><div class="del-d">Dual-axis scoring (Business Value x Readiness) classifying each use case into Accelerate, Prepare First, or Opportunistic quadrants.</div></div>
+<div class="del" data-r="3"><div class="del-n">Phased AI Roadmap</div><div class="del-d">12-month implementation timeline across three horizons: Foundation (M1&ndash;6), Augment (M3&ndash;9), Transform (M8&ndash;12), with dependencies and resource plans.</div></div>
+<div class="del" data-r="4"><div class="del-n">Value Quantification Report</div><div class="del-d">Bottom-up financial modelling for each use case with calculation methodology, blended rates, realization factors, and sensitivity analysis.</div></div>
+</div></div></section>
+
+
+<!-- BUSINESS OUTCOMES FRAMEWORK -->
+<section class="sec light" style="padding:60px 0"><div class="c">
+<div class="sub" data-r><div class="sub-l">OUR FRAMEWORK</div><div class="sub-t">Business Outcomes Model</div><div class="sub-d">Every use case is evaluated against four outcome dimensions. This ensures AI investments are tied directly to measurable business value, not technology for its own sake.</div></div>
+<div class="bo-grid" data-r>
+<div class="bo-card rev"><div class="bo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="bo-title">Revenue</div><div class="bo-items">Increase revenue and support growth through better lead conversion, advisor retention, and client acquisition intelligence.</div></div>
+<div class="bo-card cost"><div class="bo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></div><div class="bo-title">Cost</div><div class="bo-items">Reduce operating costs and improve efficiency through automation of manual processes, document handling, and compliance workflows.</div></div>
+<div class="bo-card qual"><div class="bo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="bo-title">Quality</div><div class="bo-items">Improve accuracy and consistency in compliance reviews, data validation, client communications, and investment screening.</div></div>
+<div class="bo-card flex"><div class="bo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M5 12H2l10-10 10 10h-3"/><path d="M7 20h10"/></svg></div><div class="bo-title">Flexibility</div><div class="bo-items">Manage capacity constraints, increase responsiveness, add new business capabilities, and scale operations without proportional headcount growth.</div></div>
+</div>
+</div></section>
+
+<!-- PHASE 2 -->
+<div class="sec-fade to-surface"></div>
+<section id="phase2" class="sec surface"><div class="c">
+<div class="ph-head"><div>
+<div class="ph-num" data-r>02</div>
+<div class="label" data-r="1"><span class="blue">PHASE 2</span> &middot; DESIGN</div>
+<div class="title" data-r="2">Use Case Design &<br>Technical Specification</div>
+<div class="rule" data-r="2"></div>
+<p class="desc" data-r="3">A roadmap identifies what to build. Phase 2 defines exactly how. Over 11 weeks, Inscend produced implementation-ready specifications for the 10 highest-complexity AI initiatives, classified as "Prepare First" due to their foundational requirements in data readiness, baseline measurement, and infrastructure.</p>
+</div><div>
+<div class="kpi-grid" data-r="2">
+<div class="kpi"><div class="kpi-n">10</div><div class="kpi-l">AI use cases<br>fully specified</div></div>
+<div class="kpi"><div class="kpi-n">5</div><div class="kpi-l">Business functions<br>covered</div></div>
+<div class="kpi"><div class="kpi-n">11</div><div class="kpi-l">Week<br>engagement</div></div>
+<div class="kpi"><div class="kpi-n">100%</div><div class="kpi-l">Implementation<br>ready on handoff</div></div>
+</div></div></div>
+
+<div class="context" data-r><div class="context-q">OUR PERSPECTIVE</div><div class="context-a">The majority of AI projects fail not because of model quality, but because of ambiguous requirements. Every input, process, output, edge case, and integration point is documented before development begins, enabling teams to build with precision rather than assumption.</div></div>
+
+<!-- McKinsey-Inspired Architecture -->
+<div class="sub" data-r><div class="sub-l">AI CAPABILITY ARCHITECTURE</div><div class="sub-t">10 Use Cases Across 5 Business Layers</div><div class="sub-d">Each use case was selected for its high business value and classified "Prepare First" due to foundational requirements in data, infrastructure, or process readiness.</div></div>
+<div class="arch" data-r>
+<div class="arch-layer"><div class="arch-fn fn-comp">Compliance <span class="fn-count">2</span></div><div class="arch-cases">
+<div class="arch-case"><span class="ac-id">COMP-05</span>Suitability Note Review<div class="ac-popup"><strong>Compliance</strong><p>Automated review of advisor suitability notes against regulatory standards</p><div class="ac-meta"><span class="ac-tag">Risk Reduction</span><span class="ac-tag">Compliance Automation</span></div></div></div>
+<div class="arch-case"><span class="ac-id">COMP-07</span>Unlicensed Advisory Email Screening<div class="ac-popup"><strong>Compliance</strong><p>Scans outbound emails for language that may constitute unlicensed financial advice</p><div class="ac-meta"><span class="ac-tag">Regulatory Risk</span><span class="ac-tag">Email Monitoring</span></div></div></div>
+</div></div>
+<div class="arch-layer"><div class="arch-fn fn-corp">Corporate Dev <span class="fn-count">5</span></div><div class="arch-cases">
+<div class="arch-case"><span class="ac-id">CORP-02</span>Contact Validation & Enrichment<div class="ac-popup"><strong>Corporate Dev</strong><p>Validates and enriches contact records using external data sources for sales pipeline accuracy</p><div class="ac-meta"><span class="ac-tag">Data Quality</span><span class="ac-tag">Pipeline Efficiency</span></div></div></div>
+<div class="arch-case"><span class="ac-id">CORP-05</span>Predictive Lead Scoring<div class="ac-popup"><strong>Corporate Dev</strong><p>Scores prospective advisor leads based on likelihood to convert using behavioral and firmographic signals</p><div class="ac-meta"><span class="ac-tag">Revenue Growth</span><span class="ac-tag">Sales Efficiency</span></div></div></div>
+<div class="arch-case"><span class="ac-id">CORP-08</span>Advisor Movement Monitoring<div class="ac-popup"><strong>Corporate Dev</strong><p>Tracks advisor transitions across firms to identify recruitment and retention opportunities</p><div class="ac-meta"><span class="ac-tag">Competitive Intel</span><span class="ac-tag">Talent Strategy</span></div></div></div>
+<div class="arch-case"><span class="ac-id">CORP-11</span>No-Show Prediction & Prevention<div class="ac-popup"><strong>Corporate Dev</strong><p>Predicts meeting no-shows and triggers automated re-engagement sequences</p><div class="ac-meta"><span class="ac-tag">Conversion Rate</span><span class="ac-tag">Time Savings</span></div></div></div>
+<div class="arch-case"><span class="ac-id">CORP-13</span>Deal Loss Analysis & Re-engagement<div class="ac-popup"><strong>Corporate Dev</strong><p>Classifies reasons for lost deals and identifies re-engagement opportunities</p><div class="ac-meta"><span class="ac-tag">Win Rate</span><span class="ac-tag">Revenue Recovery</span></div></div></div>
+</div></div>
+<div class="arch-layer"><div class="arch-fn fn-inv">Investment <span class="fn-count">1</span></div><div class="arch-cases">
+<div class="arch-case"><span class="ac-id">INV-06</span>AI Security Screening & Filtering<div class="ac-popup"><strong>Investment</strong><p>Automated screening of securities against compliance watchlists and restriction rules</p><div class="ac-meta"><span class="ac-tag">Trade Compliance</span><span class="ac-tag">Speed</span></div></div></div>
+</div></div>
+<div class="arch-layer"><div class="arch-fn fn-mkt">Marketing <span class="fn-count">1</span></div><div class="arch-cases">
+<div class="arch-case"><span class="ac-id">MKT-08</span>Advisor-Specific Ad Campaign Generator<div class="ac-popup"><strong>Marketing</strong><p>Generates personalized digital ad campaigns for individual advisor recruitment targets</p><div class="ac-meta"><span class="ac-tag">Lead Generation</span><span class="ac-tag">Personalization</span></div></div></div>
+</div></div>
+<div class="arch-layer"><div class="arch-fn fn-ops">Operations <span class="fn-count">1</span></div><div class="arch-cases">
+<div class="arch-case"><span class="ac-id">OPS-01</span>KYC Account Opening Automation<div class="ac-popup"><strong>Operations</strong><p>End-to-end automation of KYC document collection, validation, and account setup workflows</p><div class="ac-meta"><span class="ac-tag">Cost Reduction</span><span class="ac-tag">Speed</span><span class="ac-tag">Accuracy</span></div></div></div>
+</div></div>
+</div>
+
+<!-- Spec cards instead of boring deliverables -->
+<div class="sub" data-r><div class="sub-l">WHAT WAS PRODUCED</div><div class="sub-t">Per Use Case Specification Package</div><div class="sub-d">Each of the 10 use cases received a complete specification package comprising four integrated documents.</div></div>
+<div class="spec-row" data-r>
+<div class="spec"><div class="spec-count">10</div><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div><div class="spec-n">Requirements Documents</div><div class="spec-d">Business context, user stories, acceptance criteria, edge cases, and success metrics.</div></div>
+<div class="spec"><div class="spec-count">10</div><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></div><div class="spec-n">Technical Specifications</div><div class="spec-d">System architecture, API definitions, integration patterns, and infrastructure requirements.</div></div>
+<div class="spec"><div class="spec-count">1</div><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="spec-n">Data Readiness Report</div><div class="spec-d">Consolidated data availability, quality assessment, gap analysis, and remediation plan.</div></div>
+<div class="spec"><div class="spec-count">1</div><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div><div class="spec-n">Risk Register & Roadmap</div><div class="spec-d">Prioritized mitigation strategies with updated dependencies and implementation sequencing.</div></div>
+</div>
+</div></section>
+
+<!-- PHASE 3 -->
+<div class="sec-fade to-dark2"></div>
+<section id="phase3" class="sec dark2"><div class="c">
+<div class="ph-head"><div>
+<div class="ph-num" data-r>03</div>
+<div class="label" data-r="1"><span class="blue">PHASE 3</span> &middot; GOVERN</div>
+<div class="title" data-r="2">AI Agent Governance<br>Platform</div>
+<div class="rule" data-r="2"></div>
+<p class="desc" data-r="3">Deploying AI agents is straightforward. Maintaining visibility into which are performing, which are drifting, which require human intervention, and whether the investment is generating returns is where most organizations struggle. Inscend built the platform that answers those questions continuously.</p>
+</div><div>
+<div class="kpi-grid" data-r="2">
+<div class="kpi"><div class="kpi-n counter" data-target="53">0</div><div class="kpi-l">AI agents registered<br>and governed</div></div>
+<div class="kpi"><div class="kpi-n">21</div><div class="kpi-l">Use cases with full<br>agent specifications</div></div>
+<div class="kpi"><div class="kpi-n">6</div><div class="kpi-l">Governance<br>modules</div></div>
+<div class="kpi"><div class="kpi-n">3-Tier</div><div class="kpi-l">KPI framework<br>(Agent &middot; Collaboration &middot; Human)</div></div>
+</div></div></div>
+
+<div class="context" data-r><div class="context-q">OUR PERSPECTIVE</div><div class="context-a">In regulated financial services, deployment without governance is a liability. Regulators require auditability: who made each decision, whether human oversight was maintained, and what happens when model behavior changes. The governance platform transforms AI oversight from a compliance burden into a strategic capability.</div></div>
+
+<!-- Knowledge Graph Visual + Agent Landscape side by side on wider concept -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:56px;align-items:start" data-r>
+<div>
+<div class="sub-l" style="margin-top:0">AGENT KNOWLEDGE GRAPH</div>
+<div class="sub-t">Mapping the AI Landscape</div>
+<div class="sub-d" style="margin-bottom:16px">Every agent, its connections, data flows, and upstream/downstream dependencies visualized in an interactive knowledge graph.</div>
+<div class="kg-wrap" id="kg-viz"><canvas id="kg-canvas"></canvas></div>
+</div>
+<div>
+<div class="sub-l" style="margin-top:0">PLATFORM CAPABILITIES</div>
+<div class="sub-t">Governance Modules</div>
+<div class="sub-d" style="margin-bottom:16px">Modular architecture that scales with AI maturity. Deploy what you need now, expand as your agent fleet grows.</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="gov live"><div class="gov-bar"></div><div class="gov-head"><div class="gov-n">Performance Management</div><span class="gov-tag live">LIVE</span></div><div class="gov-d">Three-tier KPI framework tracking agent accuracy, human-agent collaboration efficiency, and workforce role evolution metrics.</div></div>
+<div class="gov live"><div class="gov-bar"></div><div class="gov-head"><div class="gov-n">Agent Registry & Knowledge Graph</div><span class="gov-tag live">LIVE</span></div><div class="gov-d">Single source of truth for every agent: connections, data flows, orchestration dependencies, and relationship mapping.</div></div>
+<div class="gov next"><div class="gov-bar"></div><div class="gov-head"><div class="gov-n">Risk & Compliance</div><span class="gov-tag next">NEXT</span></div><div class="gov-d">Agent-level risk scoring, PII classification, human-in-the-loop adherence tracking, and automated compliance flagging.</div></div>
+<div class="gov next"><div class="gov-bar"></div><div class="gov-head"><div class="gov-n">Cost & ROI Tracking</div><span class="gov-tag next">NEXT</span></div><div class="gov-d">Cost-per-call analytics, spend allocation by function and model, and ROI measurement against Phase 2 baselines.</div></div>
+<div class="gov plan"><div class="gov-bar"></div><div class="gov-head"><div class="gov-n">Data Governance</div><span class="gov-tag plan">PLANNED</span></div><div class="gov-d">Data lineage visualization, PII exposure mapping, quality scoring, and cross-agent dependency tracking.</div></div>
+<div class="gov plan"><div class="gov-bar"></div><div class="gov-head"><div class="gov-n">Policies, Controls & Audit</div><span class="gov-tag plan">PLANNED</span></div><div class="gov-d">HITL thresholds, escalation rules, approval workflows, immutable decision logs, and export-ready audit trails.</div></div>
+</div>
+</div>
+</div>
+
+<!-- AGENT CONSTELLATION -->
+<div class="sub" data-r><div class="sub-l">AGENT LANDSCAPE</div><div class="sub-t">53 Agents. 5 Functions. Every One Governed.</div><div class="sub-d">Each agent is registered with a designated role, model type, and connection map. Orchestrators coordinate workflows. Validators enforce rules. Workers execute tasks.</div></div>
+<div class="ag-wrap" data-r id="agent-viz"></div>
+<div class="ag-legend" data-r>
+<div class="ag-legend-item"><div class="ag-legend-swatch orch"></div>Orchestrator</div>
+<div class="ag-legend-item"><div class="ag-legend-swatch work"></div>Worker</div>
+<div class="ag-legend-item"><div class="ag-legend-swatch valid"></div>Validator</div>
+</div>
+</div></section>
+
+<!-- RESULTS -->
+<section id="results" class="sec dark" style="border-top:1px solid rgba(255,255,255,.03)"><div class="c">
+<div class="val-grid">
+<div>
+<div class="label" data-r><span class="blue">RESULTS</span></div>
+<div class="title" data-r="1" style="color:#fff">The Compounding Value<br>of Structured AI Adoption</div>
+<div class="rule" data-r="1"></div>
+<p class="desc" data-r="2">Each phase unlocked the capabilities the next required. The roadmap produced clarity. The specifications produced confidence. The governance platform produced control. Together, they created an AI capability that compounds rather than a collection of disconnected experiments.</p>
+</div>
+<div class="vs-grid" data-r="3">
+<div class="vs"><div class="vs-n">$738K</div><div class="vs-l">Estimated annual value<br>mapped across all use cases</div></div>
+<div class="vs"><div class="vs-n">41</div><div class="vs-l">Use cases identified,<br>scored, and roadmapped</div></div>
+<div class="vs"><div class="vs-n">53</div><div class="vs-l">AI agents designed,<br>specified, and governed</div></div>
+<div class="vs"><div class="vs-n">5</div><div class="vs-l">Business functions<br>with AI capability mapped</div></div>
+<div class="vs"><div class="vs-n">3-Tier</div><div class="vs-l">KPI governance<br>framework deployed</div></div>
+<div class="vs"><div class="vs-n">~6<span class="u" style="font-size:16px;opacity:.4">mo</span></div><div class="vs-l">From initial engagement<br>to governed AI fleet</div></div>
+</div></div></div></section>
+
+<!-- SERVICES -->
+<div class="sec-fade to-light"></div>
+<section id="services" class="sec light"><div class="c" style="text-align:center">
+<div class="label" data-r>OUR SERVICES</div>
+<div class="title" data-r="1">What We Do</div>
+<div class="rule" data-r="1" style="margin:12px auto 16px"></div>
+<p class="desc" data-r="2" style="margin:0 auto;text-align:center;max-width:460px">Inscend makes AI operational: solving real problems, generating measurable returns, and accelerating your work. Every engagement follows a proven methodology refined across regulated industries.</p>
+<div class="why-grid" data-r="3" style="text-align:left">
+<div class="why"><div class="why-n">AI Strategy & Roadmapping</div><div class="why-d">Identify high-impact AI opportunities, align with strategic objectives, and build a scalable roadmap that delivers measurable outcomes.</div></div>
+<div class="why"><div class="why-n">Custom AI Agents</div><div class="why-d">Design and deploy AI agents tailored to your operations, from compliance automation to predictive analytics, with human oversight built in from day one.</div></div>
+<div class="why"><div class="why-n">Automation & Workflows</div><div class="why-d">Reduce costs, increase throughput, and scale operations through intelligent workflow orchestration across your technology stack.</div></div>
+<div class="why"><div class="why-n">AI Governance</div><div class="why-d">Monitor, measure, and control AI with purpose-built governance platforms. Performance tracking, risk management, and audit readiness for regulated environments.</div></div>
+<div class="why"><div class="why-n">Training & Enablement</div><div class="why-d">Equip teams to integrate AI effectively through hands-on workshops, change management frameworks, and sustained adoption support.</div></div>
+<div class="why"><div class="why-n">Ongoing Support</div><div class="why-d">Continuously refine and enhance AI systems as they evolve with business needs, regulatory changes, and market dynamics.</div></div>
+</div></div></section>
+
+<section id="cta" style="position:relative"><div class="c">
+<div class="cta-t" data-r>Ready to Start?</div>
+<p class="cta-d" data-r="1">Whether you are exploring AI for the first time or governing agents already in production, we meet you where you are.</p>
+<a href="https://inscendai.com/contact-us" class="cta-btn" data-r="2" target="_blank">Book a Discovery Call</a>
+</div></section>
+
+<footer id="footer"><div class="c">
+<div class="f-logo">INSCEND <span>AI</span></div>
+<div class="f-meta">Toronto, Canada &middot; Dubai, UAE &middot; <a href="mailto:info@inscendai.com">info@inscendai.com</a> &middot; <a href="https://inscendai.com" target="_blank">inscendai.com</a></div>
+</div></footer>
+
+<script>
+// PROGRESS
+const prog=document.getElementById('progress');
+window.addEventListener('scroll',()=>{prog.style.width=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100)+'%'},{passive:true});
+
+// NAV SCROLL
+window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>80)},{passive:true});
+
+// ACTIVE NAV SECTION TRACKING
+const navLinks=document.querySelectorAll('.nav-links a[data-sec]');
+const sections=[];
+navLinks.forEach(a=>{const s=document.getElementById(a.dataset.sec);if(s)sections.push({el:s,link:a})});
+const secObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    const match=sections.find(s=>s.el===e.target);
+    if(match) match.link.classList.toggle('active',e.isIntersecting);
+  });
+},{threshold:0,rootMargin:'-20% 0px -60% 0px'});
+sections.forEach(s=>secObs.observe(s.el));
+
+// SCROLL REVEAL
+const rObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('v')})},{threshold:.06,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('[data-r]').forEach(el=>rObs.observe(el));
+
+// COUNTERS
+function easeOutExpo(t){return t===1?1:1-Math.pow(2,-10*t)}
+const cObs=new IntersectionObserver(entries=>{entries.forEach(e=>{
+  if(!e.isIntersecting||e.target.dataset.done)return;e.target.dataset.done='1';
+  const target=+e.target.dataset.target,start=performance.now();
+  function tick(now){const t=Math.min((now-start)/1200,1);e.target.textContent=Math.round(easeOutExpo(t)*target);if(t<1)requestAnimationFrame(tick)}
+  requestAnimationFrame(tick);
+})},{threshold:.5});
+document.querySelectorAll('.counter').forEach(el=>cObs.observe(el));
+
+// BAR CHART
+const bObs=new IntersectionObserver(entries=>{entries.forEach(e=>{
+  if(!e.isIntersecting||e.target.dataset.done)return;e.target.dataset.done='1';
+  e.target.querySelectorAll('.bar-fill').forEach((f,i)=>{setTimeout(()=>{f.style.width=f.dataset.w},i*120)});
+  e.target.querySelectorAll('.bar-range').forEach((r,i)=>{setTimeout(()=>{r.classList.add('v')},i*120+600)});
+})},{threshold:.3});
+document.querySelectorAll('.bars').forEach(el=>bObs.observe(el));
+
+// KNOWLEDGE GRAPH — ALIVE CANVAS
+(function(){
+const wrap=document.getElementById('kg-viz');if(!wrap)return;
+const canvas=document.getElementById('kg-canvas');if(!canvas)return;
+const ctx=canvas.getContext('2d');
+let W,H,dpr,mx=-999,my=-999,raf,started=false;
+
+function resize(){
+  const r=wrap.getBoundingClientRect();
+  dpr=window.devicePixelRatio||1;
+  W=r.width;H=r.height||400;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();window.addEventListener('resize',resize);
+
+wrap.addEventListener('mousemove',e=>{const r=wrap.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
+wrap.addEventListener('mouseleave',()=>{mx=-999;my=-999});
+
+// Node definitions
+const raw=[
+  {x:.5,y:.48,r:26,label:'PLATFORM',type:'core'},
+  {x:.22,y:.22,r:18,label:'OPS',type:'mid'},{x:.78,y:.22,r:18,label:'COMP',type:'mid'},
+  {x:.18,y:.68,r:18,label:'CORP',type:'mid'},{x:.82,y:.68,r:18,label:'INV',type:'mid'},
+  {x:.5,y:.12,r:18,label:'MKT',type:'mid'},
+  {x:.35,y:.12,r:9,type:'sm'},{x:.65,y:.1,r:9,type:'sm'},
+  {x:.08,y:.42,r:8,type:'sm'},{x:.92,y:.42,r:8,type:'sm'},
+  {x:.28,y:.82,r:9,type:'sm'},{x:.72,y:.82,r:9,type:'sm'},
+  {x:.5,y:.88,r:8,type:'sm'},{x:.1,y:.8,r:8,type:'sm'},
+  {x:.9,y:.16,r:8,type:'sm'},{x:.4,y:.32,r:8,type:'sm'},
+  {x:.6,y:.32,r:8,type:'sm'},{x:.35,y:.58,r:8,type:'sm'},
+  {x:.65,y:.58,r:8,type:'sm'}
+];
+
+const edges=[[0,1],[0,2],[0,3],[0,4],[0,5],[1,6],[1,8],[2,7],[2,9],[2,14],[3,10],[3,13],[3,12],[4,11],[4,9],[5,6],[5,7],[1,15],[2,16],[3,17],[4,18],[15,16],[17,18],[6,7],[10,12],[11,12]];
+
+// Build animated nodes
+const nodes=raw.map(n=>({
+  bx:n.x,by:n.y,x:n.x*W,y:n.y*H,r:n.r,label:n.label,type:n.type,
+  vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,
+  phase:Math.random()*Math.PI*2,freq:.3+Math.random()*.4,amp:n.type==='core'?2:n.type==='mid'?4:6,
+  glow:0,scale:0
+}));
+
+// Particles flowing along edges
+const particles=[];
+function spawnParticle(){
+  if(particles.length>40)return;
+  const ei=Math.floor(Math.random()*edges.length);
+  const[a,b]=edges[ei];
+  particles.push({a,b,t:0,speed:.003+Math.random()*.004,life:1});
+}
+
+let time=0;
+function draw(){
+  time+=.016;
+  ctx.clearRect(0,0,W,H);
+
+  // Update node positions (gentle drift)
+  nodes.forEach(n=>{
+    n.x=n.bx*W+Math.sin(time*n.freq+n.phase)*n.amp;
+    n.y=n.by*H+Math.cos(time*n.freq*.7+n.phase)*n.amp*.8;
+    // Mouse repulsion
+    const dx=mx-n.x,dy=my-n.y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<120&&d>0){
+      const f=(120-d)/120*8;
+      n.x-=dx/d*f;n.y-=dy/d*f;
+    }
+    n.glow=d<80?.4*(80-d)/80:0;
+    // Spawn animation
+    if(started&&n.scale<1)n.scale=Math.min(1,n.scale+.02);
+  });
+
+  // Draw edges
+  edges.forEach(([a,b])=>{
+    const n1=nodes[a],n2=nodes[b];
+    ctx.beginPath();ctx.moveTo(n1.x,n1.y);ctx.lineTo(n2.x,n2.y);
+    const grad=ctx.createLinearGradient(n1.x,n1.y,n2.x,n2.y);
+    grad.addColorStop(0,'rgba(59,130,246,'+(0.06+n1.glow*.2)*n1.scale+')');
+    grad.addColorStop(1,'rgba(59,130,246,'+(0.06+n2.glow*.2)*n2.scale+')');
+    ctx.strokeStyle=grad;ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // Draw/update particles
+  if(Math.random()<.15)spawnParticle();
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];p.t+=p.speed;
+    if(p.t>=1){particles.splice(i,1);continue;}
+    const n1=nodes[p.a],n2=nodes[p.b];
+    const px=n1.x+(n2.x-n1.x)*p.t,py=n1.y+(n2.y-n1.y)*p.t;
+    const alpha=Math.sin(p.t*Math.PI)*.6*n1.scale;
+    ctx.beginPath();ctx.arc(px,py,2,0,Math.PI*2);
+    ctx.fillStyle='rgba(96,165,250,'+alpha+')';ctx.fill();
+    // Trail
+    const tt=Math.max(0,p.t-.06);
+    const tx=n1.x+(n2.x-n1.x)*tt,ty=n1.y+(n2.y-n1.y)*tt;
+    ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(px,py);
+    ctx.strokeStyle='rgba(96,165,250,'+alpha*.4+')';ctx.lineWidth=1.5;ctx.stroke();
+  }
+
+  // Draw nodes
+  nodes.forEach(n=>{
+    const s=n.scale;if(s<=0)return;
+    const r=n.r*s;
+    // Glow
+    if(n.type==='core'||n.glow>.05){
+      const g=ctx.createRadialGradient(n.x,n.y,r,n.x,n.y,r*3);
+      const glowA=n.type==='core'?.12+Math.sin(time*1.5)*.04:n.glow*.3;
+      g.addColorStop(0,'rgba(59,130,246,'+glowA*s+')');
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(n.x,n.y,r*3,0,Math.PI*2);ctx.fill();
+    }
+
+    // Node body
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    if(n.type==='core'){
+      ctx.fillStyle='rgba(59,130,246,'+(0.8+Math.sin(time*1.5)*.1)*s+')';ctx.fill();
+      ctx.strokeStyle='rgba(96,165,250,'+(0.5*s)+')';ctx.lineWidth=2;ctx.stroke();
+    }else if(n.type==='mid'){
+      ctx.fillStyle='rgba(59,130,246,'+(.12*s)+')';ctx.fill();
+      ctx.strokeStyle='rgba(59,130,246,'+(.35*s)+')';ctx.lineWidth=1.5;ctx.stroke();
+    }else{
+      ctx.fillStyle='rgba(59,130,246,'+(.06*s)+')';ctx.fill();
+      ctx.strokeStyle='rgba(59,130,246,'+(.15*s)+')';ctx.lineWidth=1;ctx.stroke();
+    }
+
+    // Label
+    if(n.label&&s>.5){
+      ctx.font='600 '+(n.type==='core'?'9':'8')+'px "JetBrains Mono",monospace';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=n.type==='core'?'rgba(255,255,255,'+s+')':'rgba(96,165,250,'+(.7*s)+')';
+      ctx.fillText(n.label,n.x,n.y);
+    }
+  });
+
+  // Core breathing ring
+  const core=nodes[0],rs=core.r*core.scale;
+  if(rs>0){
+    const ringR=rs+6+Math.sin(time*2)*3;
+    ctx.beginPath();ctx.arc(core.x,core.y,ringR,0,Math.PI*2);
+    ctx.strokeStyle='rgba(96,165,250,'+(0.12+Math.sin(time*2)*.06)+')';
+    ctx.lineWidth=1;ctx.stroke();
+    const ringR2=rs+14+Math.sin(time*1.3)*4;
+    ctx.beginPath();ctx.arc(core.x,core.y,ringR2,0,Math.PI*2);
+    ctx.strokeStyle='rgba(96,165,250,'+(0.05+Math.sin(time*1.3)*.03)+')';
+    ctx.lineWidth=.5;ctx.stroke();
+  }
+
+  raf=requestAnimationFrame(draw);
+}
+
+// Start on scroll
+const kgObs=new IntersectionObserver(entries=>{entries.forEach(e=>{
+  if(e.isIntersecting&&!started){started=true;draw();}
+  if(!e.isIntersecting&&started){cancelAnimationFrame(raf);started=false;}
+})},{threshold:.1});
+kgObs.observe(wrap);
+})();
+
+// AGENT CONSTELLATION
+const AG=[
+{fn:"Operations",id:"OPS-01",nm:"KYC Workflow Orchestrator",rl:"Orchestrator",md:"Rules"},
+{fn:"Operations",id:"OPS-02",nm:"Document OCR Extractor",rl:"Worker",md:"Hybrid"},
+{fn:"Operations",id:"OPS-03",nm:"KYC Field Validator",rl:"Validator",md:"Rules"},
+{fn:"Operations",id:"OPS-04",nm:"Sanctions Screening",rl:"Worker",md:"ML"},
+{fn:"Operations",id:"OPS-05",nm:"PEP/Adverse Media Checker",rl:"Worker",md:"Hybrid"},
+{fn:"Operations",id:"OPS-06",nm:"Risk Aggregator",rl:"Orchestrator",md:"Rules"},
+{fn:"Operations",id:"OPS-07",nm:"Source of Funds Analyzer",rl:"Worker",md:"LLM"},
+{fn:"Operations",id:"OPS-08",nm:"KYC Completion Reporter",rl:"Worker",md:"LLM"},
+{fn:"Compliance",id:"CMP-01",nm:"ID Verification Orchestrator",rl:"Orchestrator",md:"Rules"},
+{fn:"Compliance",id:"CMP-02",nm:"ID Document OCR",rl:"Worker",md:"Hybrid"},
+{fn:"Compliance",id:"CMP-03",nm:"ID-to-Record Matcher",rl:"Validator",md:"ML"},
+{fn:"Compliance",id:"CMP-04",nm:"Suitability Note Extractor",rl:"Worker",md:"LLM"},
+{fn:"Compliance",id:"CMP-05",nm:"Suitability Matrix Checker",rl:"Validator",md:"Rules"},
+{fn:"Compliance",id:"CMP-06",nm:"Suitability Review Reporter",rl:"Worker",md:"LLM"},
+{fn:"Compliance",id:"CMP-07",nm:"Email Ingestion Agent",rl:"Worker",md:"Rules"},
+{fn:"Compliance",id:"CMP-08",nm:"Advisory Language Classifier",rl:"Worker",md:"LLM"},
+{fn:"Compliance",id:"CMP-09",nm:"Compliance Alert Dispatcher",rl:"Orchestrator",md:"Rules"},
+{fn:"Compliance",id:"CMP-10",nm:"PEP False Positive Resolver",rl:"Worker",md:"Hybrid"},
+{fn:"Compliance",id:"CMP-11",nm:"Marketing Content Scanner",rl:"Worker",md:"LLM"},
+{fn:"Compliance",id:"CMP-12",nm:"Regulatory Term Matcher",rl:"Validator",md:"Rules"},
+{fn:"Corporate Dev",id:"CRP-01",nm:"CSA Data Ingestor",rl:"Worker",md:"Rules"},
+{fn:"Corporate Dev",id:"CRP-02",nm:"Contact Validator",rl:"Validator",md:"ML"},
+{fn:"Corporate Dev",id:"CRP-03",nm:"Data Enrichment Agent",rl:"Worker",md:"Hybrid"},
+{fn:"Corporate Dev",id:"CRP-04",nm:"Feature Extraction Engine",rl:"Worker",md:"ML"},
+{fn:"Corporate Dev",id:"CRP-05",nm:"Lead Scoring Model",rl:"Worker",md:"ML"},
+{fn:"Corporate Dev",id:"CRP-06",nm:"Score Calibration Agent",rl:"Validator",md:"Rules"},
+{fn:"Corporate Dev",id:"CRP-07",nm:"CSA Movement Monitor",rl:"Worker",md:"ML"},
+{fn:"Corporate Dev",id:"CRP-08",nm:"Movement Alert Generator",rl:"Worker",md:"Rules"},
+{fn:"Corporate Dev",id:"CRP-09",nm:"No-Show Predictor",rl:"Worker",md:"ML"},
+{fn:"Corporate Dev",id:"CRP-10",nm:"Prevention Sequencer",rl:"Worker",md:"Rules"},
+{fn:"Corporate Dev",id:"CRP-11",nm:"Loss Reason Classifier",rl:"Worker",md:"LLM"},
+{fn:"Corporate Dev",id:"CRP-12",nm:"Re-engagement Scorer",rl:"Worker",md:"ML"},
+{fn:"Corporate Dev",id:"CRP-13",nm:"Meeting Transcriber",rl:"Worker",md:"Hybrid"},
+{fn:"Corporate Dev",id:"CRP-14",nm:"Notes Summarizer",rl:"Worker",md:"LLM"},
+{fn:"Corporate Dev",id:"CRP-15",nm:"DAR Data Extractor",rl:"Worker",md:"LLM"},
+{fn:"Corporate Dev",id:"CRP-16",nm:"Report Generator",rl:"Worker",md:"LLM"},
+{fn:"Corporate Dev",id:"CRP-17",nm:"Call Quality Scorer",rl:"Worker",md:"LLM"},
+{fn:"Corporate Dev",id:"CRP-18",nm:"QA Dashboard Agent",rl:"Worker",md:"Rules"},
+{fn:"Investment",id:"INV-01",nm:"Criteria Parser",rl:"Worker",md:"LLM"},
+{fn:"Investment",id:"INV-02",nm:"Universe Screener",rl:"Worker",md:"ML"},
+{fn:"Investment",id:"INV-03",nm:"Screening Reporter",rl:"Worker",md:"LLM"},
+{fn:"Investment",id:"INV-04",nm:"Input Validator",rl:"Validator",md:"Rules"},
+{fn:"Investment",id:"INV-05",nm:"Anomaly Detector",rl:"Worker",md:"ML"},
+{fn:"Investment",id:"INV-06",nm:"Trade QA Agent",rl:"Validator",md:"Rules"},
+{fn:"Investment",id:"INV-07",nm:"Reconciliation Checker",rl:"Validator",md:"Rules"},
+{fn:"Investment",id:"INV-08",nm:"QA Alert Generator",rl:"Worker",md:"Rules"},
+{fn:"Marketing",id:"MKT-01",nm:"Advisor Profile Extractor",rl:"Worker",md:"LLM"},
+{fn:"Marketing",id:"MKT-02",nm:"Audience Builder",rl:"Worker",md:"ML"},
+{fn:"Marketing",id:"MKT-03",nm:"Ad Copy Generator",rl:"Worker",md:"LLM"},
+{fn:"Marketing",id:"MKT-04",nm:"Creative Variant Engine",rl:"Worker",md:"LLM"},
+{fn:"Marketing",id:"MKT-05",nm:"Campaign Orchestrator",rl:"Orchestrator",md:"Rules"},
+{fn:"Marketing",id:"MKT-06",nm:"Performance Monitor",rl:"Worker",md:"ML"},
+{fn:"Marketing",id:"MKT-07",nm:"Budget Optimizer",rl:"Worker",md:"ML"}
+];
+
+const fnClass={Operations:'fn-ops',Compliance:'fn-comp','Corporate Dev':'fn-corp',Investment:'fn-inv',Marketing:'fn-mkt'};
+const viz=document.getElementById('agent-viz');
+const groups={};AG.forEach(a=>{if(!groups[a.fn])groups[a.fn]=[];groups[a.fn].push(a)});
+let dotIndex=0;
+Object.entries(groups).forEach(([fn,ags])=>{
+  const row=document.createElement('div');row.className='ag-fn';
+  const head=document.createElement('div');head.className='ag-fn-head';
+  head.innerHTML=fn+' <span class="ag-fn-count">('+ags.length+')</span>';
+  row.appendChild(head);
+  const dots=document.createElement('div');dots.className='ag-dots';
+  ags.forEach(a=>{
+    const d=document.createElement('div');d.className='ag-dot '+(fnClass[a.fn]||'');d.dataset.rl=a.rl;
+    d.dataset.idx=dotIndex++;d.textContent=a.id.split('-')[1];
+    const tip=document.createElement('div');tip.className='ag-tip';
+    tip.innerHTML='<strong>'+a.nm+'</strong><span class="m">'+a.id+' \u00B7 '+a.rl+' \u00B7 '+a.md+'</span>';
+    d.appendChild(tip);dots.appendChild(d);
+  });
+  row.appendChild(dots);viz.appendChild(row);
+});
+
+const agObs=new IntersectionObserver(entries=>{entries.forEach(e=>{
+  if(!e.isIntersecting||e.target.dataset.spawned)return;e.target.dataset.spawned='1';
+  e.target.querySelectorAll('.ag-dot').forEach(d=>{setTimeout(()=>d.classList.add('spawned'),parseInt(d.dataset.idx)*18)});
+})},{threshold:.15});
+agObs.observe(viz);
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-60,behavior:'smooth'})})});
+
+
+// Arch-case popups
+document.querySelectorAll('.arch-case').forEach(c=>{
+  c.addEventListener('click',e=>{
+    const wasOpen=c.classList.contains('show-popup');
+    document.querySelectorAll('.arch-case.show-popup').forEach(x=>x.classList.remove('show-popup'));
+    if(!wasOpen)c.classList.add('show-popup');
+    e.stopPropagation();
+  });
+});
+document.addEventListener('click',()=>document.querySelectorAll('.arch-case.show-popup').forEach(x=>x.classList.remove('show-popup')));
+
+// Results box scroll animation
+const vsObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.vs').forEach(v=>v.classList.add('in-view'))}});
+},{threshold:.2});
+document.querySelectorAll('.vs-grid').forEach(g=>vsObs.observe(g));
+
+// Agent role data attributes for border styling
+document.querySelectorAll('.ag-box').forEach(b=>{
+  const meta=b.querySelector('.m');
+  if(meta){
+    const txt=meta.textContent;
+    if(txt.includes('Orchestrator'))b.setAttribute('data-role','Orchestrator');
+    else if(txt.includes('Validator'))b.setAttribute('data-role','Validator');
+    else b.setAttribute('data-role','Worker');
+  }
+});
+
+</script>
+</body></html>
